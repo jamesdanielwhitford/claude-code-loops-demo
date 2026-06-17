@@ -7,11 +7,14 @@ const products = [
   { id: 3, name: 'Doohickey', price: 4.99 },
 ]
 
-// Bug: search is case-sensitive, should be case-insensitive
-// Missing validation: no check that q param exists
 router.get('/', (req, res) => {
   const { q } = req.query
-  const results = products.filter(p => p.name.includes(q))
+  if (!q || typeof q !== 'string' || q.trim() === '') {
+    return res.status(400).json({ error: 'q parameter is required' })
+  }
+  const results = products.filter(p =>
+    p.name.toLowerCase().includes(q.toLowerCase())
+  )
   res.json(results)
 })
 

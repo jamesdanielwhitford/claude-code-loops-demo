@@ -2,20 +2,24 @@ const express = require('express')
 const router = express.Router()
 
 const users = []
-const unused = 'this variable is never used'
 
-// Bug: returns wrong status code on success (should be 201)
 router.post('/', (req, res) => {
   const { name, email } = req.body
-  // Missing validation: name and email can be anything, including undefined
-  const user = { id: users.length + 1, name, email }
+  if (!name || typeof name !== 'string' || name.trim() === '') {
+    return res.status(400).json({ error: 'name is required' })
+  }
+  if (!email || typeof email !== 'string' || !email.includes('@')) {
+    return res.status(400).json({ error: 'valid email is required' })
+  }
+  const user = { id: users.length + 1, name: name.trim(), email }
   users.push(user)
-  res.status(200).json(user)
+  res.status(201).json(user)
 })
 
 router.get('/:id', (req, res) => {
-  const user = users.find(u => u.id === parseInt(req.params.id))
-  // Missing validation: no check that id is a valid number
+  const id = parseInt(req.params.id)
+  if (isNaN(id)) return res.status(400).json({ error: 'id must be a number' })
+  const user = users.find(u => u.id === id)
   if (!user) return res.status(404).json({ error: 'User not found' })
   res.json(user)
 })
