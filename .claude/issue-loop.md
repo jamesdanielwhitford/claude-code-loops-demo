@@ -8,9 +8,23 @@ If it has the label `security-audit`:
   Post the findings as a comment on the issue with `gh issue comment`.
 
 If it has the label `superagent`:
-  Read the issue body. Extract any attached image URL (the mockup).
-  Then run:
-  "ultracode: rework public/index.html to match the attached mockup image as closely as possible. Use Opus as the orchestrator and judge. Use Haiku for implementation workers. Each worker handles one section of the page. After each round, Opus compares the rendered page to the mockup and sends failing sections back for rework. Stop when Opus judges the page matches the mockup."
-  Post a comment on the issue when done with `gh issue comment`, then close it with `gh issue close`.
+  Read the issue body and extract the target URL.
+  Then run the following ultracode workflow:
+
+  "ultracode: Redesign public/index.html to match the style and functionality of the target URL as closely as possible.
+
+  Phase 1 — Analyse (Opus):
+  Use Playwright to visit the target URL. Extract: color palette, fonts, layout structure, navigation patterns, interactive elements, and overall visual style. Also note what functionality exists (search, cart, filters, etc). Write a detailed design spec to .claude/design-spec.md.
+
+  Phase 2 — Implement (Haiku workers, in parallel):
+  Split public/index.html into sections (header, hero, product grid, footer, etc). Assign one Haiku worker per section. Each worker reads the design spec and rewrites its section to match.
+
+  Phase 3 — Judge (Opus):
+  Start the local server with `npm start`. Use Playwright to screenshot localhost and the target URL side by side. Compare layout, colors, fonts, and spacing. Test that interactive elements (search, buttons, links) behave correctly. For each section that does not match, write specific rework instructions and send back to a Haiku worker.
+
+  Phase 4 — Loop:
+  Repeat phases 2-3 until Opus judges the page matches the target URL in both style and functionality. Maximum 5 rounds.
+
+  When complete, post a summary comment on the issue with `gh issue comment` describing what was changed, then close it with `gh issue close`."
 
 If no issues have either label, say "no action needed" in one line.

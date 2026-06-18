@@ -57,13 +57,18 @@ The issue loop will detect it, run an ultracode audit across all three route fil
 
 ## Step 4 — Trigger the superagent styling loop (ultracode + /goal via issue label)
 
-Create a new GitHub issue with the label `superagent`. Attach a mockup image of how you want `public/index.html` to look:
+Find a shop website you want to clone the style and functionality of. Create a new GitHub issue with the label `superagent` and paste the URL in the body:
 
 ```bash
-gh issue create --title "Style the frontend" --body "Make it look like the attached mockup. ![mockup](URL_TO_YOUR_IMAGE)" --label superagent
+gh issue create --title "Redesign the frontend" --body "Redesign to match this site: https://example-shop.com" --label superagent
 ```
 
-The issue loop will detect it, extract the mockup image, and launch a full multi-model workflow: Opus orchestrates, Haiku workers implement each section, Opus judges the result, and the loop continues until the page matches the mockup. When done, it posts a comment and closes the issue.
+The issue loop will detect it, extract the target URL, and launch a full multi-model workflow:
+- **Opus** visits the target URL with Playwright, extracts design patterns and functionality, writes a spec
+- **Haiku workers** (parallel) each rewrite one section of `public/index.html` from the spec
+- **Opus** screenshots both the local app and the target URL, compares them, and sends failing sections back to Haiku
+- The loop continues until Opus judges the page matches in both style and functionality
+- When done, it posts a comment summarising the changes and closes the issue
 
 ## Repo structure
 
@@ -79,7 +84,7 @@ tests/
   orders.test.js
   search.test.js
 public/
-  index.html        — unstyled frontend
+  index.html        — unstyled frontend (gets redesigned in step 4)
 .claude/
   loop.md           — CI babysitter prompt (used by bare /loop)
   issue-loop.md     — issue watcher prompt (used by /loop issue-loop)
