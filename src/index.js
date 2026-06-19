@@ -1,4 +1,3 @@
-// Shop API entry point
 const express = require('express')
 const path = require('path')
 const usersRouter = require('./routes/users')
